@@ -20,11 +20,24 @@ module stem_base(){
     cylinder($stem_height, radius, radius, true);
 }
 
-module stem(){
+module single_stem(){
     translate([0,0,$stem_height/2+$stem_location]){
         difference(){
             stem_base();
             stem_cross();
+        }
+    }
+}
+
+module stems(unit=1){
+    if (unit < 2){
+        single_stem();
+    }
+    if (unit >= 2 && unit < 6) {
+        union(){
+            single_stem();
+            translate([11.938,0,0]) single_stem();
+            translate([-11.938,0,0]) single_stem();
         }
     }
 }
@@ -36,13 +49,25 @@ $lhs_hole_side=15.4;
 $lhs_height=11;
 $lhs_radius=42;
 
-module lhs_outer(){
+module lhs_outer(unit=1){
     bottom_side=$lhs_hole_side+$lhs_wall_thick*2;
     top_side=$lhs_top_side;
     hull(){
-        cube([bottom_side,bottom_side,0.001], true);
-        translate([0,0,$lhs_height]){
-            cube([top_side,top_side,0.001], true);
+        hull(){
+            translate([19.05/2*(unit-1),0,0]){
+                cube([bottom_side,bottom_side,0.001], true);
+            }
+            translate([-19.05/2*(unit-1),0,0]){
+                cube([bottom_side,bottom_side,0.001], true);
+            }
+        }
+        hull(){
+            translate([19.05/2*(unit-1),0,$lhs_height]){
+                cube([top_side,top_side,0.001], true);
+            }
+            translate([-19.05/2*(unit-1),0,$lhs_height]){
+                cube([top_side,top_side,0.001], true);
+            }
         }
     }
 }
@@ -60,11 +85,35 @@ module text_model(char=""){
 }
 
 
-module lhs_inner(char=""){
+module lhs_inner(char="",unit=1){
     bottom_side=$lhs_hole_side;
     top_side=$lhs_top_side+3;
     union(){
         hull(){
+            hull(){
+                translate([19.05/2*(unit-1),0,0]){
+                    cube([bottom_side,bottom_side,0.001], true);
+                }
+                translate([-19.05/2*(unit-1),0,0]){
+                    cube([bottom_side,bottom_side,0.001], true);
+                }
+            }
+            hull(){
+                translate([
+                    19.05/2*(unit-1),
+                    0,
+                    $stem_height+$stem_location
+                ]){
+                    cube([top_side,top_side,0.001], true);
+                }
+                translate([
+                    -19.05/2*(unit-1),
+                    0,
+                    $stem_height+$stem_location
+                ]){
+                    cube([top_side,top_side,0.001], true);
+                }
+            }
             cube([bottom_side,bottom_side,0.001], true);
             translate([0,0,$stem_height+$stem_location]){
                 cube([top_side,top_side,0.001], true);
@@ -76,58 +125,53 @@ module lhs_inner(char=""){
     }    
 }
 
-module multi_unit_sphere(unit_count=1){
-    $fn=80;
-    hull(){
-        translate([-19.05/2*(unit_count-1),0,0]) sphere($lhs_radius);
-        translate([19.05/2*(unit_count-1),0,0]) sphere($lhs_radius);
-    }
+module multi_unit_sphere(unit=1){
+    $fn=128;
+    scale([unit*1.5^(unit-1),1,1]) sphere($lhs_radius);
 }
 
-module lhs(y=0,z=0,char=""){
+module lhs(y=0,z=0,char="",unit=1){
     union(){
-        stem();
+        stems(unit);
         difference(){
             difference(){
-                lhs_outer();
-                lhs_inner(char=char);
+                lhs_outer(unit=unit);
+                lhs_inner(char=char,unit=unit);
             }
             translate([
                 0,
                 y,
                 $lhs_height+$lhs_radius-z
-            ]) multi_unit_sphere(1);
+            ]) multi_unit_sphere(unit=unit);
 
         }
     }
 }
 
-module lhs_space(y=0,z=0){
+module lhs_r4(unit=1){
+    lhs(8,2.75, "R4", unit);
+}
+
+module lhs_r3(unit=1){
+    lhs(3,4.5, "R3", unit);
+}
+
+module lhs_r2(unit=1){
+    lhs(-4,4.4, "R2", unit);
+}
+
+module lhs_r1(unit=1){
+    lhs(-9,2.75, "R1", unit);
+}
+
+module lhs_home(){
     union(){
-        stem();
-        difference(){
-            difference(){
-                lhs_outer();
-                lhs_inner();
-            }
+        lhs(3,4.5,char="R3",unit=1);
+        hull(){
+           translate([-3,-4.5,7]) sphere(0.5);
+           translate([3,-4.5,7]) sphere(0.5);
         }
-        difference(){
-            translate([
-                0,
-                y,
-                -$lhs_height-$lhs_radius+z
-            ])sphere($lhs_radius);
-        }
-
     }
 }
-// space
-//translate([0,19.05*-1,0]) lhs_space(8,3);
-// r4
-lhs(8,2.75, "R4");
-// r3
-//translate([0,19.05,0]) lhs(3,4.5, "R3");
-// r2
-//translate([0,19.05*2,0]) lhs(-4,4.4, "R2");
-// r1
-//translate([0,19.05*3,0]) lhs(-9,2.75, "R1");
+
+lhs_home();
