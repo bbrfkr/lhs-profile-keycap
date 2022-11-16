@@ -148,6 +148,23 @@ module lhs(y=0,z=0,char="",unit=1){
     }
 }
 
+module lhs_convex(y=0,z=0,char="",unit=1){
+
+    union(){
+        stems(unit);
+        intersection(){
+            difference(){
+                lhs_outer(unit=unit);
+                lhs_inner(char=char,unit=unit);
+            }
+            rotate([0,90,0]) {
+                $fn=128;
+                scale([1,1.2,1]) cylinder(19.05*unit,11,11,true);
+            }
+        }
+    }    
+}
+
 module lhs_r4(unit=1){
     lhs(8,2.75, "R4", unit);
 }
@@ -174,4 +191,6 @@ module lhs_home(){
     }
 }
 
-lhs_home();
+module lhs_space(unit=1){
+    lhs_convex(8,2.75,"R4",unit);
+}
