@@ -159,7 +159,7 @@ module lhs_convex(y=0,z=0,char="",unit=1){
             }
             rotate([0,90,0]) {
                 $fn=128;
-                scale([1,1.2,1]) cylinder(19.05*unit,11,11,true);
+                scale([1,1.8,1]) cylinder(19.05*unit,8,8,true);
             }
         }
     }    
