@@ -33,11 +33,25 @@ module stems(unit=1){
     if (unit < 2){
         single_stem();
     }
-    if (unit >= 2 && unit < 6) {
+    if (unit >= 2 && unit < 3) {
         union(){
             single_stem();
             translate([11.938,0,0]) single_stem();
             translate([-11.938,0,0]) single_stem();
+        }
+    }
+    if (unit == 6.25) {
+        union(){
+            single_stem();
+            translate([50,0,0]) single_stem();
+            translate([-50,0,0]) single_stem();
+        }
+    }
+    if (unit == 7) {
+        union(){
+            single_stem();
+            translate([57.15,0,0]) single_stem();
+            translate([-57.15,0,0]) single_stem();
         }
     }
 }
@@ -119,10 +133,12 @@ module lhs_inner(char="",unit=1){
                 cube([top_side,top_side,0.001], true);
             }
         }
-        translate([0,$stem_diameter-1,$stem_height+$stem_location]){
-            mirror([1,0,0]) text_model(char);
+        if (char != ""){
+            translate([0,$stem_diameter-1,$stem_height+$stem_location]){
+                mirror([1,0,0]) text_model(char);
+            }
         }
-    }    
+    }
 }
 
 module multi_unit_sphere(unit=1){
@@ -149,7 +165,6 @@ module lhs(y=0,z=0,char="",unit=1){
 }
 
 module lhs_convex(y=0,z=0,char="",unit=1){
-
     union(){
         stems(unit);
         intersection(){
@@ -163,6 +178,65 @@ module lhs_convex(y=0,z=0,char="",unit=1){
             }
         }
     }    
+}
+
+module lhs_iso_outer(){
+    union(){
+        translate([
+            -19.05/2*(0.25),
+            19.05/2*(1),
+            0
+        ]) lhs_outer(1.5);
+        difference(){
+            hull(){
+                translate([0,19.05/2*(1),0]) lhs_outer(1.25);
+                translate([0,-19.05/2*(1),0]) lhs_outer(1.25);
+            }
+            translate([
+                -19.05/2*(0.25),
+                19.05/2*(1),
+                0
+            ]) lhs_outer(1.5);
+        }
+    }
+}
+
+module lhs_iso_inner(){
+    union(){
+        translate([
+            -19.05/2*(0.25),
+            19.05/2*(1),
+            0
+        ]) lhs_inner(unit=1.5);
+        difference(){
+            hull(){
+                translate([0,19.05/2*(1),0]) lhs_inner(unit=1.25);
+                translate([0,-19.05/2*(1),0]) lhs_inner(unit=1.25);
+            }
+            translate([
+                -19.05/2*(0.25),
+                19.05/2*(1),
+                0
+            ]) lhs_inner(unit=1.5);
+        }
+    }
+}
+
+module lhs_iso(){
+    union(){
+        rotate([0,0,90]) stems(2);
+        difference(){
+            lhs_iso_outer();
+            lhs_iso_inner();
+            translate([
+                -19.05/2*(0.25),
+                -2,
+                $lhs_height+$lhs_radius-4.5
+            ]) {
+                scale([2,1,1]) rotate([0,0,90]) multi_unit_sphere(1.4);
+            }
+        }
+    }
 }
 
 module lhs_r4(unit=1){
@@ -194,3 +268,4 @@ module lhs_home(){
 module lhs_space(unit=1){
     lhs_convex(8,2.75,"R4",unit);
 }
+
