@@ -91,7 +91,7 @@ module text_model(char=""){
         text(
             char,
             font = "DejaVu Sans:style=Bold",
-            size = 3,
+            size = 2,
             halign = "center",
             valign = "center"
         );
@@ -101,7 +101,7 @@ module text_model(char=""){
 
 module lhs_inner(char="",unit=1){
     bottom_side=$lhs_hole_side;
-    top_side=$lhs_top_side+3;
+    top_side=$lhs_top_side+1.8;
     union(){
         hull(){
             hull(){
@@ -134,7 +134,7 @@ module lhs_inner(char="",unit=1){
             }
         }
         if (char != ""){
-            translate([0,$stem_diameter-1,$stem_height+$stem_location]){
+            translate([0,$stem_diameter-1.2,$stem_height+$stem_location]){
                 mirror([1,0,0]) text_model(char);
             }
         }
@@ -268,4 +268,3 @@ module lhs_home(){
 module lhs_space(unit=1){
     lhs_convex(8,2.75,"R4",unit);
 }
-
