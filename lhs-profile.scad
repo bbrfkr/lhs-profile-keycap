@@ -40,7 +40,7 @@ module stems(unit=1){
         union(){
             single_stem();
             translate([11.938*(1+$shrink_rate),0,0]) single_stem();
-            translate([-11.938(1+$shrink_rate),0,0]) single_stem();
+            translate([-11.938*(1+$shrink_rate),0,0]) single_stem();
         }
     }
     if (unit == 6.25) {
@@ -213,4 +213,4 @@ module lhs_space(unit=1){
     lhs_convex(8,2.75,"R4",unit);
 }
 
-$shrink_rate=0.004;
+//$shrink_rate=0.003;
